@@ -1,0 +1,142 @@
+<?xml version="1.0"?>
+<robot name="diffrobot"
+    xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <!-- This file demonstrates the use of some <gazebo> tags -->
+
+    <!-- To include it add the following line -->
+    <!-- <xacro:include filename="example_gazebo.xacro" /> -->
+
+    <!-- Gazebo is unable to use the same <material> tags that are already in the URDF (that RViz uses). -->
+    <!-- Instead, we need to add gazebo tags for our links that refer to Gazebo materials -->
+
+    <gazebo reference="base_link">
+        <mu1>0.0</mu1>
+        <mu2>0.0</mu2>
+        <slip1>1.0</slip1>
+        <slip2>1.0</slip2>
+        <material>Gazebo/Orange</material>
+    </gazebo>
+    <gazebo reference="left_wheel">
+        <mu1>0.1</mu1>
+        <mu2>0.1</mu2>
+        <kp>500000.0</kp>
+        <kd>10.0</kd>
+        <maxVel>0.1</maxVel>
+        <minDepth>0.001</minDepth>
+        <fdir1>1 0 0</fdir1>
+        <material>Gazebo/Black</material>
+    </gazebo>
+    <gazebo reference="right_wheel">
+        <mu1>0.1</mu1>
+        <mu2>0.1</mu2>
+        <kp>500000.0</kp>
+        <kd>10.0</kd>
+        <maxVel>0.1</maxVel>
+        <minDepth>0.001</minDepth>
+        <fdir1>1 0 0</fdir1>
+        <material>Gazebo/Black</material>
+    </gazebo>
+
+
+    <gazebo>
+        <plugin name="differential_drive_controller" filename="libgazebo_ros_diff_drive.so">
+            <update_rate>100</update_rate>
+            <num_wheel_pairs>1</num_wheel_pairs>
+            <left_joint>left_wheel_base_link_joint</left_joint>
+            <right_joint>right_wheel_base_link_joint</right_joint>
+            <wheel_separation>0.1825</wheel_separation>
+            <wheel_diameter>0.063</wheel_diameter>
+            <!-- Maximum torque which the wheels can produce, in Nm, defaults to 5 Nm -->
+            <max_wheel_torque>0.5</max_wheel_torque>
+            <max_wheel_acceleration>0.5</max_wheel_acceleration>
+            <!-- Topic to receive geometry_msgs/Twist message commands, defaults to `cmd_vel` -->
+            <command_topic>cmd_vel</command_topic>
+            <!-- Topic to publish nav_msgs/Odometry messages, defaults to `odom` -->
+            <odometry_topic>odom</odometry_topic>
+            <!-- Odometry frame, defaults to `odom` -->
+            <odometry_frame>odom</odometry_frame>
+            <!-- Robot frame to calculate odometry from, defaults to `base_footprint` -->
+            <robot_base_frame>base_link</robot_base_frame>
+            <!-- Set to true to publish transforms for the wheel links, defaults to false -->
+            <publish_wheel_tf>true</publish_wheel_tf>
+            <!-- Set to true to publish transforms for the odometry, defaults to true -->
+            <publish_odom>true</publish_odom>
+            <publish_odom_tf>true</publish_odom_tf>
+        </plugin>
+    </gazebo>
+
+
+    <!-- Gazebo requires the use of plugins to interact with other systems such as ROS. -->
+
+
+    <!-- This plugin will publish the joint_states for the selected joints 
+            (which robot_state_publisher can then use to broadcast the approprate tf). -->
+
+    <!-- <gazebo>
+        <plugin name="gazebo_ros_joint_state_publisher" filename="libgazebo_ros_joint_state_publisher.so">
+            <update_rate>100</update_rate>
+            <joint_name>left_wheel_base_link_joint</joint_name>
+            <joint_name>right_wheel_base_link_joint</joint_name>
+        </plugin>
+    </gazebo> -->
+
+
+    <!-- This plugin will read a JointTrajectory message from the /set_joint_trajectory topic 
+            and move the machine accordingly. It's a bit clunky but it works. -->
+    <!-- You'll probably want to add damping to the joints to stop them it flopping around. 
+            e.g. <dynamics damping="10.0" friction="10.0"/> -->
+    <!-- Here's an example message to publish to test it:
+            ros2 topic pub -1 /set_joint_trajectory trajectory_msgs/msg/JointTrajectory  '{header: {frame_id: world}, joint_names: [slider_joint, arm_joint], points: [  {positions: {0.8,0.6}} ]}' -->
+    <!-- <gazebo>
+        <plugin name="gazebo_ros_joint_pose_trajectory" filename="libgazebo_ros_joint_pose_trajectory.so">
+            <update_rate>2</update_rate>
+        </plugin>
+    </gazebo> -->
+
+
+
+    <!-- hokuyo -->
+    <gazebo reference="lidar">
+        <sensor type="ray" name="lidar_sensor">
+            <pose>0 0 0.015 0 0 0</pose>
+            <visualize>false</visualize>
+            <update_rate>50</update_rate>
+            <ray>
+                <scan>
+                    <horizontal>
+                        <samples>1600</samples>
+                        <resolution>1</resolution>
+                        <min_angle>0</min_angle>
+                        <max_angle>6.2831853</max_angle>
+                    </horizontal>
+                </scan>
+                <range>
+                    <min>0.2</min>
+                    <max>25.0</max>
+                    <resolution>0.001</resolution>
+                </range>
+                <noise>
+                    <type>gaussian</type>
+                    <!-- Noise parameters based on published spec for Hokuyo laser
+               achieving "+-30mm" accuracy at range < 10m.  A mean of 0.0m and
+               stddev of 0.01m will put 99.7% of samples within 0.03m of the true
+               reading. -->
+                    <mean>0.0</mean>
+                    <stddev>0.01</stddev>
+                </noise>
+            </ray>
+            <plugin name="lidar_controller" filename="libgazebo_ros_ray_sensor.so">
+                <ros>
+                    <namespace>/</namespace>
+                    <remapping>~/out:=/scan_sim</remapping>
+                </ros>
+                <output_type>sensor_msgs/LaserScan</output_type>
+                <frame_name>lidar</frame_name>
+                <min_intensity>0.0</min_intensity>
+            </plugin>
+        </sensor>
+    </gazebo>
+
+
+</robot>
