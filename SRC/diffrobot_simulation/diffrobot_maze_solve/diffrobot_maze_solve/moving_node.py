@@ -122,6 +122,18 @@ def turn(self, clockwise, speed, time):
   s = "Turned robot " + clockwise + " for " + str(time) + " seconds"
   return s
 
-if __name__=='__main__':
+def main(args=None):
+  rclpy.init(args=args)
   robotcontrol_object = RobotMoving()
+
+  try:
+    rclpy.spin(robotcontrol_object)
+  except KeyboardInterrupt:
+    pass
+
+  robotcontrol_object.destroy_node()
+  rclpy.shutdown()
+
+if __name__ == '__main__':
+  main()
   

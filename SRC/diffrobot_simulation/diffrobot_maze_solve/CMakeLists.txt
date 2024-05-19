@@ -12,9 +12,10 @@ find_package(ament_cmake_python REQUIRED)
 find_package(rclpy REQUIRED)
 find_package(rclcpp REQUIRED)
 
-#python module
+# Install Python modules
 ament_python_install_package(${PROJECT_NAME})
 
+# Install scripts
 install(PROGRAMS
   scripts/algorithm_node.py
   DESTINATION lib/${PROJECT_NAME}

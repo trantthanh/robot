@@ -14,8 +14,9 @@ class Robot:
     self.robotturn_speed = 0.8
     self.robotturn_time = 1
   
-    while True:
-        
+  def robotmove(self):
+    
+    while True:  
         self.laser1 = robotcontrol.get_laser(360)
         distance_right = robotcontrol.get_laser(90)  # Right distance
         distance_front = self.laser1
@@ -47,7 +48,6 @@ def main(args=None):
   try:
     while rclpy.ok():
       robot.robotmove()
-      robot.robotturn()
   except KeyboardInterrupt:
     pass
 
