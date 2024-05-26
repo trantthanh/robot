@@ -4,7 +4,7 @@ FROM althack/ros2:humble-gazebo-2023-09-03
 
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update \
-   && apt-get -y install --no-install-recommends mesa-utils mesa-va-drivers ros-humble-plotjuggler-ros ros-humble-joint-state-publisher ros-humble-slam-toolbox ros-humble-nav2-bringup ros-humble-navigation2 htop xterm \
+   && apt-get -y install --no-install-recommends mesa-utils mesa-va-drivers ros-humble-plotjuggler-ros ros-humble-joint-state-publisher ros-humble-slam-toolbox ros-humble-nav2-bringup ros-humble-navigation2 ros-humble-rviz2 htop xterm \
    #
    # Clean up
    && apt-get autoremove -y \
